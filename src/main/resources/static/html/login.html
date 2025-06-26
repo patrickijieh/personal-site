@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="apple-touch-icon" sizes="180x180" href="../favicon/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="../favicon/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="../favicon/favicon-16x16.png">
+        <link rel="manifest" href="../favicon/site.webmanifest">
+        <link rel="stylesheet" href="../styles/styles.css">
+        <script src="../js/login.js"></script>
+        <title>patrickijieh's admin page</title>
+    </head>
+    <body>
+        <main style="display: grid; justify-items: center;">
+            <section class="welcome">
+                <h2>login</h2>
+            </section>
+            <section class="form"> 
+                <form onsubmit="submit_form()">
+                    <label for="username">username: </label><br/>
+                    <input type="text" id="username" name="username"><br/>
+                    <label for="password">password: </label><br/>
+                    <input type="password" id="password" name="password"><br/>
+                    <input type="submit" value="login" formmethod="dialog"><br/>
+                </form>
+            </section>
+        </main>
+    </body>
+</html>
