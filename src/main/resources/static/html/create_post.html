@@ -6,21 +6,21 @@
         <link rel="icon" type="image/png" sizes="16x16" href="../favicon/favicon-16x16.png">
         <link rel="manifest" href="../favicon/site.webmanifest">
         <link rel="stylesheet" href="../styles/styles.css">
-        <script src="../js/login.js"></script>
+        <script src="../js/create_post.js"></script>
         <title>patrickijieh's admin page</title>
     </head>
     <body>
         <main style="display: grid; justify-items: center;">
             <section class="welcome">
-                <h2>login</h2>
+                <h1>create post</h1>
             </section>
             <section class="form"> 
-                <form onsubmit="submit_form()">
-                    <label for="username">username: </label><br/>
-                    <input type="text" id="username" name="username" required><br/>
-                    <label for="password">password: </label><br/>
-                    <input type="password" id="password" name="password" required><br/>
-                    <input type="submit" value="login" formmethod="dialog"><br/>
+                <form onsubmit="submit_post()">
+                    <label for="title">post title: </label><br/>
+                    <input type="text" id="title" name="title" required><br/>
+                    <label for="post_body">share your thoughts here:</label><br/>
+                    <textarea rows="30" cols="40" id="post_body" name="post_body" maxlength="4096" required></textarea><br/>
+                    <input type="submit" value="post away!" formmethod="dialog"><br/>
                 </form>
             </section>
         </main>

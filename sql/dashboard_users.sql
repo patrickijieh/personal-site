@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS dashboard_users (
     id int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL CONSTRAINT must_be_unique UNIQUE,
     password VARCHAR NOT NULL
 );

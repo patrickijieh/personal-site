@@ -3,6 +3,7 @@ package com.pijieh.personalsite.controllers;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -22,18 +23,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.pijieh.personalsite.database.DBService;
 import com.pijieh.personalsite.helpers.OffsetDateTimeAdapter;
-import com.pijieh.personalsite.models.Blog;
-import com.pijieh.personalsite.models.BlogForm;
-
-import jakarta.servlet.http.HttpSession;
+import com.pijieh.personalsite.models.BlogPost;
+import com.pijieh.personalsite.models.PostIndex;
 
 @Controller
+@RequestMapping("/blog")
 public class BlogController {
     private final static Logger logger = LoggerFactory.getLogger(BlogController.class);
     private final static Gson gson = new GsonBuilder()
@@ -42,31 +42,73 @@ public class BlogController {
     @Autowired
     DBService dataSource;
 
-    @GetMapping("/blog")
-    public String blog(@RequestParam Optional<String> id) {
+    @GetMapping(value = { "", "/{id}" })
+    public String blog(@PathVariable Optional<String> id) {
         if (id.isEmpty())
-            return "html/blog.html";
+            return "/html/blog.html";
 
-        return "html/post.html";
+        return "/html/post.html";
     }
 
-    @PostMapping("/blog")
-    public ResponseEntity<String> createBlog(HttpSession session, @Validated @RequestBody BlogForm blogForm) {
+    @GetMapping("/posts")
+    public ResponseEntity<String> getBlogPosts() {
+        List<BlogPost> posts;
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        try (Connection conn = dataSource.getConnection()) {
+            posts = DSL.using(conn, SQLDialect.POSTGRES)
+                    .resultQuery("SELECT {0}, {1}, {2}, {3} FROM {4} ORDER BY ({0}, {3}) DESC LIMIT 5",
+                            DSL.name("id"),
+                            DSL.name("title"),
+                            DSL.name("created_by"),
+                            DSL.name("created_at"),
+                            DSL.name("posts"))
+                    .fetchStream().map(this::buildPostWithoutBody).toList();
 
-        String postId = "1";
-        if (null != session.getAttribute("username")) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            if (posts.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+        } catch (SQLException ex) {
+            logger.error("", ex);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        final String body = gson.toJson(Map.of("posts", posts));
+        return new ResponseEntity<>(body, headers, HttpStatus.OK);
+    }
 
-        logger.info("Created new blog post with id: {}", postId);
-        final String body = gson.toJson(Map.of("message", "success", "id", postId));
+    @PostMapping("/posts/newpage")
+    public ResponseEntity<String> getBlogPostFromIdx(@Validated @RequestBody PostIndex postIdx) {
+        List<BlogPost> posts;
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        try (Connection conn = dataSource.getConnection()) {
+            posts = DSL.using(conn, SQLDialect.POSTGRES)
+                    .resultQuery(
+                            "SELECT {0}, {1}, {2}, {3} FROM {4} WHERE ({0}, {3}) < ({5}, {6}) ORDER BY ({0}, {3}) DESC LIMIT 5",
+                            DSL.name("id"),
+                            DSL.name("title"),
+                            DSL.name("created_by"),
+                            DSL.name("created_at"),
+                            DSL.name("posts"),
+                            DSL.val(postIdx.getId()),
+                            DSL.val(postIdx.getCreatedAt()))
+                    .fetchStream().map(this::buildPostWithoutBody).toList();
+
+            if (posts.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+        } catch (SQLException ex) {
+            logger.error("", ex);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        final String body = gson.toJson(Map.of("posts", posts));
         return new ResponseEntity<>(body, headers, HttpStatus.OK);
     }
 
     @GetMapping("/posts/{id}")
-    public ResponseEntity<String> getBlogPostWithId(@PathVariable("id") int id) {
+    public ResponseEntity<String> getBlogPostWithId(@PathVariable int id) {
         Record post;
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -85,7 +127,7 @@ public class BlogController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        Blog blogPost = Blog.builder()
+        BlogPost blogPost = BlogPost.builder()
                 .id(post.get("id", Integer.class))
                 .title(post.get("title", String.class))
                 .postBody(post.get("post_body", String.class))
@@ -95,5 +137,18 @@ public class BlogController {
 
         final String body = gson.toJson(blogPost);
         return new ResponseEntity<>(body, headers, HttpStatus.OK);
+    }
+
+    private BlogPost buildPostWithoutBody(Record record) {
+        Integer id = record.get("id", Integer.class);
+        String title = record.get("title", String.class);
+        OffsetDateTime createdAt = record.get("created_at", OffsetDateTime.class);
+        String createdBy = record.get("created_by", String.class);
+        return BlogPost.builder()
+                .id(id)
+                .title(title)
+                .createdAt(createdAt)
+                .createdBy(createdBy)
+                .build();
     }
 }

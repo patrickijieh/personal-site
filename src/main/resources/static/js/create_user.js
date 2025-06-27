@@ -1,7 +1,13 @@
 async function submit_form() {
     let user = document.getElementById("username").value;
     let pass = document.getElementById("password").value;
-    let res = await fetch("/login", {
+    let verify_pass = document.getElementById("verify_password").value;
+
+    if (pass !== verify_pass) {
+        return;
+    }
+
+    let res = await fetch("/admin/users", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -15,7 +21,4 @@ async function submit_form() {
     .then(data => {return data;});
 
     console.log(res);
-
-    if (res.location)
-        window.location = "/"+res.location;
 }

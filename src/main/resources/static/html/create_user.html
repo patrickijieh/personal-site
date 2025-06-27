@@ -6,7 +6,7 @@
         <link rel="icon" type="image/png" sizes="16x16" href="../favicon/favicon-16x16.png">
         <link rel="manifest" href="../favicon/site.webmanifest">
         <link rel="stylesheet" href="../styles/styles.css">
-        <script src="../js/login.js"></script>
+        <script src="../js/create_user.js"></script>
         <title>patrickijieh's admin page</title>
     </head>
     <body>
@@ -20,7 +20,9 @@
                     <input type="text" id="username" name="username" required><br/>
                     <label for="password">password: </label><br/>
                     <input type="password" id="password" name="password" required><br/>
-                    <input type="submit" value="login" formmethod="dialog"><br/>
+                    <label for="verify_password">verify password: </label><br/>
+                    <input type="password" id="verify_password" name="verify_password" required><br/>
+                    <input type="submit" value="create new user" formmethod="dialog"><br/>
                 </form>
             </section>
         </main>

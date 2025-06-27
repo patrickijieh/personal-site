@@ -17,19 +17,27 @@ body {
 }
 
 .header {
-    height: 10%;
+    height: 8%;
     background-color: #7B2CBF;
-    padding: 20px;
     display: flex;
     color: white;
     align-items: center;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    transition: top 0.3s;
+}
+
+.active {
+    background-color: #3C096C;
 }
 
 .welcome {
     display: grid;
     align-items: center;
     justify-items: center;
-    margin: 10rem;
+    margin-top: 10rem;
+    margin-bottom: 10rem;
 }
 
 .welcome img {
@@ -44,21 +52,28 @@ body {
     display: grid;
     align-items: center;
     justify-items: center;
-    width: 50%;
-    height: 50%;
+    width: fit-content;
     margin: 10rem;
     background-color: #7B2CBF;
     border-radius: 10px;
+    padding: 5rem;
 }
 
 .navigation-link {
-    margin-left: 20px;
-    margin-right: 20px;
+    display: grid;
+    align-items: center;
+    height: 100%; 
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .link {
     text-decoration: none;
     color: white;
+    padding-left: 2rem;
+    padding-right: 2rem;
 }
 
 .title {
@@ -89,4 +104,18 @@ body {
     justify-items: center;
     margin-top: 40rem;
     margin-bottom: 40rem;
+}
+
+.posts-section {
+    display: grid;
+    align-items: center;
+}
+
+.post-link {
+    padding: 10rem;
+    margin: 2rem;
+}
+
+.post-link:hover {
+    background-color: #7B2CBF;
 }

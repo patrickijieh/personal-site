@@ -4,9 +4,9 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value
-public class BlogForm {
+public class UserForm {
     @NonNull
-    String postTitle;
+    String username;
     @NonNull
-    String postBody;
+    String password;
 }
