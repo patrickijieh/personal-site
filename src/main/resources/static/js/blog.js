@@ -1,3 +1,5 @@
+let observer = null;
+
 const options = {
     root: null,
     rootMargin: "0px",
@@ -7,7 +9,6 @@ const options = {
 const handleIntersect = (entries) => {
     entries.forEach((entry) => {
         if (entry.isIntersecting) {
-            console.log("Element is visible!");
             if (document.getElementById("last-post"))
                 get_new_blog_page();
         }
@@ -16,32 +17,31 @@ const handleIntersect = (entries) => {
 
 async function get_new_blog_page() {
 
-    let last_post = document.getElementById("last-post");
+    const last_post = document.getElementById("last-post");
     
-    let val = last_post.getAttribute("value").split("/");
-    let id = val[0];
-    let datetime = val[1];
-    let res = await fetch("/blog/posts/newpage", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            "id": id,
-            "createdAt" : datetime
+    const val = last_post.getAttribute("value").split("/");
+    const id = val[0];
+    const datetime = val[1];
+    let res;
+    try {
+        res = await fetch("/blog/posts/newpage", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "id": id,
+                "createdAt" : datetime
+            })
         })
-    })
-    .then(response => {
-        if (!response.ok) {
-            return;
-        }
-        return response.json();
-    })
-    .then(data => {return data;});
-
-    console.log(res);
-
-    if (!res) {
+        .then(response => {
+            if (!response.ok) {
+                throw new Error();
+            }
+            return response.json();
+        })
+        .then(data => {return data;});
+    } catch (err) {
         cleanup();
         return;
     }
@@ -50,75 +50,93 @@ async function get_new_blog_page() {
 }
 
 function cleanup() {
-    document.getElementById("target").remove;
+    const target = document.getElementById("target");
+    if (observer) {
+        observer.disconnect();
+    }
+    const paragraph = document.createElement("p");
+    paragraph.innerHTML = "I was wrong. You're not greedy...<br /><br />\
+        ...<br /><br />\
+        ...<br /><br />\
+        you're BATS*** INSANE!";
+
+    target.appendChild(paragraph);
+    paragraph.setAttribute("style", "text-align: center;");
+    target.setAttribute("style", "display: grid; justify-items: center;");
 }
 
 function setup_blog() {
     get_posts();
 
     const target = document.getElementById("target");
-    if (!target) 
+    if (!target) {
         console.log("no target was found!");
+        return;
+    }
 
-    let observer = new IntersectionObserver(handleIntersect, options);
-
+    observer = new IntersectionObserver(handleIntersect, options);
     observer.observe(target);
 }
 
 function create_post_elements(postList) {
-    let post_elements = [];
+    const post_elements = [];
     for (let i = 0; i < postList.length; i++) {
-        let post = postList[i];
-        let element = document.createElement("div");
-        let title = document.createElement("h2");
-        let createdAt = document.createElement("p");
-        let createdBy = document.createElement("p");
+        const post = postList[i];
+        const root_element = document.createElement("div");
+        const anchor = document.createElement("a");
+        const title = document.createElement("h2");
+        const createdAt = document.createElement("p");
+        const createdBy = document.createElement("p");
+
         title.innerText = post.title;
-        createdBy.innerText = post.createdBy;
+        createdBy.innerText = `authored by: ${post.createdBy}`;
         createdAt.innerText = new Date(post.createdAt).toLocaleString();
-        element.setAttribute("value", post.id+"/"+post.createdAt);
-        element.setAttribute("class", "post-link");
-        element.appendChild(title);;
-        element.appendChild(createdBy);
-        element.appendChild(createdAt);
+        root_element.setAttribute("value", `${post.id}/${post.createdAt}`);
+        anchor.setAttribute("class", "post-link");
+        anchor.setAttribute("href", `/blog/${post.id}`);
+
+        anchor.appendChild(title);;
+        anchor.appendChild(createdBy);
+        anchor.appendChild(createdAt);
+        root_element.appendChild(anchor);
+
+        // add last-post tag to last element
         if (i == postList.length-1) {
-            let old_last_post = document.getElementById("last-post");
+            const old_last_post = document.getElementById("last-post");
             if (old_last_post) {
                 old_last_post.removeAttribute("id");
             }
-            element.setAttribute("id", "last-post");
+            root_element.setAttribute("id", "last-post");
         }
-        post_elements.push(element);
+        post_elements.push(root_element);
     }
     return post_elements;
 }
 
 function append_posts(postsList) {
-    let elements = create_post_elements(postsList);
-    let post_section = document.getElementById("posts");
+    const elements = create_post_elements(postsList);
+    const post_section = document.getElementById("posts");
     elements.forEach(element => {
         post_section.appendChild(element);
     });
-
 }
 
 async function get_posts() {
-    let res = await fetch("/blog/posts", {
-        method: "GET"
-    })
-    .then(response => {
-        if (!response.ok) {
-            return;
-        }
-        return response.json();
-    })
-    .then(data => {return data;});
-
-    console.log(res);
-
-    if (!res) {
-        console.log("error");
+    let res;
+    try {
+        res = await fetch("/blog/posts", {
+            method: "GET"
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error();
+            }
+            return response.json();
+        })
+        .then(data => {return data;});
+    } catch (err) {
         cleanup();
+        console.error(err);
         return;
     }
     append_posts(res.posts);

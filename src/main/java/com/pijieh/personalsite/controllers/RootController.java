@@ -29,20 +29,30 @@ public class RootController {
     }
 
     @GetMapping("/resume")
-    public ResponseEntity<byte[]> resume() throws IOException {
-        final byte[] resumeBytes = rsFinder.getResourceBytes("Ijieh_Patrick.pdf");
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setCacheControl("no-cache");
-        return new ResponseEntity<>(resumeBytes, headers, HttpStatus.OK);
+    public ResponseEntity<byte[]> resume() {
+        try {
+            final byte[] resumeBytes = rsFinder.getResourceBytes("Ijieh_Patrick.pdf");
+            final HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setCacheControl("no-cache");
+            return new ResponseEntity<>(resumeBytes, headers, HttpStatus.OK);
+        } catch (IOException ex) {
+            logger.error("", ex);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/icon")
-    public ResponseEntity<byte[]> icon() throws IOException {
-        final byte[] iconBytes = rsFinder.getResourceBytes("icon.png");
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_PNG);
-        headers.setCacheControl("no-cache");
-        return new ResponseEntity<>(iconBytes, headers, HttpStatus.OK);
+    public ResponseEntity<byte[]> icon() {
+        try {
+            final byte[] iconBytes = rsFinder.getResourceBytes("icon.png");
+            final HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_PNG);
+            headers.setCacheControl("no-cache");
+            return new ResponseEntity<>(iconBytes, headers, HttpStatus.OK);
+        } catch (IOException ex) {
+            logger.error("", ex);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

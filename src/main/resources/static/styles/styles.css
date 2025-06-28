@@ -112,10 +112,19 @@ body {
 }
 
 .post-link {
-    padding: 10rem;
+    height: 20rem;
+    padding: 2rem;
     margin: 2rem;
+    display: grid;
+    text-decoration: none;
+    color: white;
 }
 
 .post-link:hover {
     background-color: #7B2CBF;
+}
+
+.post-body {
+    width: 75%;
+    margin: 10rem;
 }
