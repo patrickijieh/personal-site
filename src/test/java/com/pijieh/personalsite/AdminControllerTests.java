@@ -38,6 +38,7 @@ class AdminControllerTests {
     @Test
     void havingSessionShouldReturnOk() throws Exception {
         MockHttpSession mockHttpSession = new MockHttpSession();
+        mockHttpSession.setAttribute("username", "dummy_user");
         this.mockMvc.perform(MockMvcRequestBuilders.get("/admin").session(mockHttpSession)).andExpect(status().isOk());
     }
 

@@ -19,8 +19,14 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
         HttpSession session = request.getSession(false);
-        if (null == session) {
-            logger.warn("UNAUTHORIZED request to /admin intercepted from addr {}", request.getRemoteAddr());
+        if (null == session || null == session.getAttribute("username")
+                || session.getAttribute("username").toString().isEmpty()) {
+
+            String address = request.getHeader("X-Real-IP");
+            if (address == null || address.isEmpty()) {
+                address = request.getRemoteAddr();
+            }
+            logger.warn("UNAUTHORIZED request to /admin intercepted from addr {}", address);
             response.sendError(403, "Forbidden");
             return false;
         }
