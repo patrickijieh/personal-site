@@ -20,12 +20,18 @@ body {
     height: 8%;
     background-color: #7B2CBF;
     display: flex;
-    color: white;
+    color: #1C1C1C;
     align-items: center;
     position: fixed;
     top: 0;
     width: 100%;
     transition: top 0.3s;
+}
+
+@media (prefers-color-scheme: dark) {
+    .header {
+        color: #F5E8D8;
+    }
 }
 
 .active {
@@ -71,9 +77,15 @@ body {
 
 .link {
     text-decoration: none;
-    color: white;
+    color: #1C1C1C;
     padding-left: 2rem;
     padding-right: 2rem;
+}
+
+@media (prefers-color-scheme: dark) {
+    .link {
+        color: #F5E8D8;
+    }
 }
 
 .title {
@@ -117,7 +129,18 @@ body {
     margin: 2rem;
     display: grid;
     text-decoration: none;
-    color: white;
+    color: #1C1C1C;
+    box-shadow:
+        rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .post-link {
+        color: #F5E8D8;
+        box-shadow:
+            rgba(75, 75, 125, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+
+    }
 }
 
 .post-link:hover {
