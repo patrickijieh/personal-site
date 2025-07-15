@@ -1,10 +1,15 @@
 package com.pijieh.personalsite.controllers;
 
+import com.google.gson.Gson;
+import com.pijieh.personalsite.database.DatabaseService;
+import com.pijieh.personalsite.models.BlogForm;
+import com.pijieh.personalsite.models.LoginForm;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.util.Map;
-
 import org.jooq.Record;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -23,14 +28,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.google.gson.Gson;
-import com.pijieh.personalsite.database.DBService;
-import com.pijieh.personalsite.models.BlogForm;
-import com.pijieh.personalsite.models.LoginForm;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-
 // Authenticated through AuthenticationInterceptor.java
 @Controller
 @RequestMapping("/admin")
@@ -39,10 +36,10 @@ public class AdminController {
     BCryptPasswordEncoder bcrypt;
 
     @Autowired
-    DBService dataSource;
+    DatabaseService dataSource;
 
-    private final static Logger logger = LoggerFactory.getLogger(AdminController.class);
-    private final static Gson gson = new Gson();
+    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
+    private static final Gson gson = new Gson();
 
     @GetMapping("")
     public String admin(HttpServletRequest request) {
@@ -68,7 +65,8 @@ public class AdminController {
     }
 
     @PostMapping("/posts")
-    public ResponseEntity<String> createPost(HttpSession session, @Validated @RequestBody BlogForm blogForm) {
+    public ResponseEntity<String> createPost(HttpSession session,
+            @Validated @RequestBody BlogForm blogForm) {
         String id = "-1";
         final HttpHeaders headers = new HttpHeaders();
         final OffsetDateTime postTime = OffsetDateTime.now();

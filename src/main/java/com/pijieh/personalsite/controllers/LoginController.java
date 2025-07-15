@@ -1,12 +1,16 @@
 package com.pijieh.personalsite.controllers;
 
+import com.google.gson.Gson;
+import com.pijieh.personalsite.database.DatabaseService;
+import com.pijieh.personalsite.models.LoginForm;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
-
-import org.jooq.impl.DSL;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +26,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.google.gson.Gson;
-import com.pijieh.personalsite.database.DBService;
-import com.pijieh.personalsite.models.LoginForm;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-
 @Controller
 @RequestMapping("/login")
 public class LoginController {
@@ -36,15 +33,16 @@ public class LoginController {
     BCryptPasswordEncoder bcrypt;
 
     @Autowired
-    DBService dataSource;
+    DatabaseService dataSource;
 
-    private final static Logger logger = LoggerFactory.getLogger(LoginController.class);
-    private final static Gson gson = new Gson();
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+    private static final Gson gson = new Gson();
 
     @GetMapping("")
     public String loginHtml(HttpSession session, HttpServletRequest request) {
-        if (null != session.getAttribute("username"))
+        if (null != session.getAttribute("username")) {
             return "redirect:/admin";
+        }
 
         return "/html/login.html";
     }
@@ -61,7 +59,8 @@ public class LoginController {
         Record adminUser;
 
         try (Connection conn = dataSource.getConnection()) {
-            adminUser = DSL.using(conn, SQLDialect.POSTGRES).resultQuery("SELECT * FROM {0} WHERE {1}={2}",
+            adminUser = DSL.using(conn, SQLDialect.POSTGRES).resultQuery(
+                    "SELECT * FROM {0} WHERE {1}={2}",
                     DSL.name("dashboard_users"),
                     DSL.name("username"),
                     DSL.val(user)).fetchOne();

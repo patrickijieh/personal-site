@@ -1,7 +1,6 @@
 package com.pijieh.personalsite.models;
 
 import java.time.OffsetDateTime;
-
 import lombok.NonNull;
 import lombok.Value;
 

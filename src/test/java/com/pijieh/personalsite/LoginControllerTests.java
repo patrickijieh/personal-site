@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.pijieh.personalsite.controllers.LoginController;
-import com.pijieh.personalsite.database.DBService;
+import com.pijieh.personalsite.database.DatabaseService;
 
 @WebMvcTest(LoginController.class)
 class LoginControllerTests {
@@ -24,8 +24,9 @@ class LoginControllerTests {
     private MockMvc mockMvc;
 
     @MockitoBean
-    DBService dataSource;
+    DatabaseService dataSource;
 
+    // Sanity check
     @Test
     void contextLoads() {
         assert loginController != null : "Test controller is null!";

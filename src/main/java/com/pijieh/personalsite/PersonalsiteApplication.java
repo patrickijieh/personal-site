@@ -1,9 +1,10 @@
 package com.pijieh.personalsite;
 
+import com.pijieh.personalsite.database.DatabaseService;
+import com.pijieh.personalsite.helpers.ResourceFinder;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.sql.SQLException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Lookup;
@@ -12,13 +13,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.pijieh.personalsite.database.DBService;
-import com.pijieh.personalsite.helpers.ResourceFinder;
-
 @SpringBootApplication
 public class PersonalsiteApplication {
     private static final Logger logger = LoggerFactory.getLogger(PersonalsiteApplication.class);
+
+    // TODO: Make these application properties
+    private static final int MIN_POOL_SIZE = 3;
+    private static final int MAX_POOL_SIZE = 10;
 
     public static void main(String[] args) {
         SpringApplication.run(PersonalsiteApplication.class, args);
@@ -35,16 +36,9 @@ public class PersonalsiteApplication {
     }
 
     @Bean
-    DBService dataSource() throws PropertyVetoException, IOException, SQLException {
-        ComboPooledDataSource cpds = new ComboPooledDataSource();
-        cpds.setDriverClass("org.postgresql.Driver");
-        cpds.setJdbcUrl(dbUrl());
-        cpds.setUser(dbUsername());
-        cpds.setPassword(dbPassword());
-        cpds.setMinPoolSize(3);
-        cpds.setMaxPoolSize(10);
-        logger.info("Successfully created database datasource.");
-        return new DBService(cpds);
+    DatabaseService dataSource() throws PropertyVetoException, IOException, SQLException {
+        return new DatabaseService("org.postgresql.Driver", dbUrl(), dbUsername(), dbPassword(),
+                MIN_POOL_SIZE, MAX_POOL_SIZE);
     }
 
     String dbUrl() throws IOException {

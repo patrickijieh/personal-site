@@ -20,6 +20,8 @@ public class ResourceFinder {
         Path envPath = Paths.get(".env");
         InputStream is = Files.newInputStream(envPath);
         props.load(is);
+
+        is.close();
         return props.getProperty(key);
     }
 }

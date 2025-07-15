@@ -11,7 +11,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.pijieh.personalsite.controllers.AdminController;
-import com.pijieh.personalsite.database.DBService;
+import com.pijieh.personalsite.database.DatabaseService;
 
 @WebMvcTest(AdminController.class)
 class AdminControllerTests {
@@ -23,8 +23,9 @@ class AdminControllerTests {
     private MockMvc mockMvc;
 
     @MockitoBean
-    DBService dataSource;
+    DatabaseService dataSource;
 
+    // Sanity check
     @Test
     void contextLoads() {
         assert adminController != null : "Test controller is null!";
