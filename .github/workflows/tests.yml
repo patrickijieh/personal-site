@@ -4,13 +4,11 @@ on:
   push:
     branches:
       - main
-      - deployment
-      - testing-ci
+      - deployment 
   pull_request:
     branches:
       - main
       - deployment
-      - testing-ci
 
 permissions:
   contents: read
