@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -24,19 +23,19 @@ public class PersonalsiteApplication {
     private static final Logger logger = LoggerFactory.getLogger(PersonalsiteApplication.class);
 
     @Value("${database.min-pool-size}")
-    private int MIN_POOL_SIZE;
+    private int minPoolSize;
 
     @Value("${database.max-pool-size}")
-    private int MAX_POOL_SIZE;
+    private int maxPoolSize;
 
     @Value("${database.url}")
-    private String DATABASE_URL;
+    private String databaseUrl;
 
     @Value("${database.username}")
-    private String DATABASE_USERNAME;
+    private String databaseUsername;
 
     @Value("${database.password}")
-    private String DATABASE_PASSWORD;
+    private String databasePassword;
 
     public static void main(String[] args) {
         SpringApplication.run(PersonalsiteApplication.class, args);
@@ -54,7 +53,7 @@ public class PersonalsiteApplication {
 
     @Bean
     DatabaseService dataSource() throws PropertyVetoException, IOException, SQLException {
-        return new DatabaseService("org.postgresql.Driver", DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD,
-                MIN_POOL_SIZE, MAX_POOL_SIZE);
+        return new DatabaseService("org.postgresql.Driver", databaseUrl, databaseUsername,
+                databasePassword, minPoolSize, maxPoolSize);
     }
 }
