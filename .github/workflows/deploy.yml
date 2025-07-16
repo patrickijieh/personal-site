@@ -29,7 +29,4 @@ jobs:
     
     - name: Logon to Server & Pull from GitHub
       run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}
-          cd /home/personalsite/personal-site
-          git checkout deployment
-          git pull origin deployment
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /home/personalsite/personal-site && git checkout deployment && git pull origin deployment"
