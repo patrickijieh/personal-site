@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   deploy:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged || github.event_name == 'push'
     runs-on: ubuntu-latest
 
     steps:
