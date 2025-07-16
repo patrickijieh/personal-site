@@ -1,0 +1,35 @@
+name: Deploy to DigitalOcean Server
+
+on:
+  push:
+    branches: 
+      - testing-cd
+  pull_request:
+    branches: 
+      - deployment
+    types:
+      - closed
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+    
+    - name: Logon to Server & Pull from GitHub
+      run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}
+          cd /home/personalsite/personal-site
+          git checkout deployment
+          git pull origin deployment

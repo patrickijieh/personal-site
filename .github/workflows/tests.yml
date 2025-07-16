@@ -5,12 +5,12 @@ on:
     branches:
       - main
       - deployment
-      - testing-ci
+      - testing-cd
   pull_request:
     branches:
       - main
       - deployment
-      - testing-ci
+      - testing-cd
 
 permissions:
   contents: read
