@@ -13,6 +13,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/**
+ * The Controller class for the / (root) route.
+ *
+ * @author patrickijieh
+ */
 @Controller
 @RequestMapping("/")
 public class RootController {
@@ -21,11 +26,21 @@ public class RootController {
     @Autowired
     ResourceFinder rsFinder;
 
+    /**
+     * GET / mapping.
+     *
+     * @return the index html page
+     */
     @GetMapping("")
     public String index() {
         return "/html/index.html";
     }
 
+    /**
+     * GET /resume mapping.
+     *
+     * @return the bytes of the resume file, or 500 response if the route fails
+     */
     @GetMapping("/resume")
     public ResponseEntity<byte[]> resume() {
         try {
@@ -40,6 +55,11 @@ public class RootController {
         }
     }
 
+    /**
+     * GET /icon mapping.
+     *
+     * @return the bytes of the icon png file, or 500 response if the route fails
+     */
     @GetMapping("/icon")
     public ResponseEntity<byte[]> icon() {
         try {

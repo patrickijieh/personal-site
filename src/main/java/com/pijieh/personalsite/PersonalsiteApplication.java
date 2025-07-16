@@ -13,6 +13,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+/**
+ * The main entrypoint of the application.
+ *
+ * @author patrickijieh
+ */
 @SpringBootApplication
 public class PersonalsiteApplication {
     private static final Logger logger = LoggerFactory.getLogger(PersonalsiteApplication.class);

@@ -10,6 +10,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+/**
+ * Middleware class that checks if a user's session is valid.
+ *
+ * @author patrickijieh
+ */
 @Component
 public class AuthenticationInterceptor implements HandlerInterceptor {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationInterceptor.class);

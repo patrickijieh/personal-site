@@ -10,6 +10,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * Web configuration file.
+ *
+ * @author patrickijieh
+ */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     @Autowired

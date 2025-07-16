@@ -30,6 +30,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/**
+ * The Controller class for the /blog route.
+ *
+ * @author patrickijieh
+ */
 @Controller
 @RequestMapping("/blog")
 public class BlogController {
@@ -41,6 +46,14 @@ public class BlogController {
     @Autowired
     DatabaseService dataSource;
 
+    /**
+     * GET /blog/ and /blog/{id} mapping.
+     *
+     * @param id the post id
+     *
+     * @return the post html page if an id is present, otherwise the blog html page
+     */
+
     @GetMapping(value = { "", "/{id}" })
     public String blog(@PathVariable Optional<String> id) {
         if (id.isEmpty()) {
@@ -50,6 +63,12 @@ public class BlogController {
         return "/html/post.html";
     }
 
+    /**
+     * GET /blog/posts/ mapping.
+     *
+     * @return a list of posts without their text body, or a 500 error response if
+     *         route fails
+     */
     @GetMapping("/posts")
     public ResponseEntity<String> getBlogPosts() {
         List<BlogPost> posts;
@@ -81,6 +100,14 @@ public class BlogController {
         return new ResponseEntity<>(body, headers, HttpStatus.OK);
     }
 
+    /**
+     * POST /blog/posts/newpage/ mapping.
+     *
+     * @param postIdx the {id, created_at} index pair
+     *
+     * @return a list of posts without their text body, or a 500 error response if
+     *         route fails
+     */
     @PostMapping("/posts/newpage")
     public ResponseEntity<String> getBlogPostFromIdx(@Validated @RequestBody PostIndex postIdx) {
         List<BlogPost> posts;
@@ -115,6 +142,13 @@ public class BlogController {
         return new ResponseEntity<>(body, headers, HttpStatus.OK);
     }
 
+    /**
+     * GET /blog/posts/{id} mapping.
+     *
+     * @param id the post id
+     *
+     * @return a post, or a 500 error response if route fails
+     */
     @GetMapping("/posts/{id}")
     public ResponseEntity<String> getBlogPostWithId(@PathVariable int id) {
         Record post;

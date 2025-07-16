@@ -6,6 +6,11 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 
+/**
+ * Converts OffsetDateTime strings from JSON to an object and vice versa.
+ *
+ * @author patrickijieh
+ */
 public class OffsetDateTimeAdapter extends TypeAdapter<OffsetDateTime> {
     @Override
     public void write(final JsonWriter jsonWriter,
