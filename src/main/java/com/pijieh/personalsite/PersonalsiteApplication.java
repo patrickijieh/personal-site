@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Lookup;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -22,9 +23,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class PersonalsiteApplication {
     private static final Logger logger = LoggerFactory.getLogger(PersonalsiteApplication.class);
 
-    // TODO: Make these application properties
-    private static final int MIN_POOL_SIZE = 3;
-    private static final int MAX_POOL_SIZE = 10;
+    @Value("${database.min-pool-size}")
+    private int MIN_POOL_SIZE;
+
+    @Value("${database.max-pool-size}")
+    private int MAX_POOL_SIZE;
+
+    @Value("${database.url}")
+    private String DATABASE_URL;
+
+    @Value("${database.username}")
+    private String DATABASE_USERNAME;
+
+    @Value("${database.password}")
+    private String DATABASE_PASSWORD;
 
     public static void main(String[] args) {
         SpringApplication.run(PersonalsiteApplication.class, args);
@@ -42,24 +54,7 @@ public class PersonalsiteApplication {
 
     @Bean
     DatabaseService dataSource() throws PropertyVetoException, IOException, SQLException {
-        return new DatabaseService("org.postgresql.Driver", dbUrl(), dbUsername(), dbPassword(),
+        return new DatabaseService("org.postgresql.Driver", DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD,
                 MIN_POOL_SIZE, MAX_POOL_SIZE);
-    }
-
-    String dbUrl() throws IOException {
-        return getRsFinder().getEnvironmentVariable("DB_URL");
-    }
-
-    String dbUsername() throws IOException {
-        return getRsFinder().getEnvironmentVariable("DB_USERNAME");
-    }
-
-    String dbPassword() throws IOException {
-        return getRsFinder().getEnvironmentVariable("DB_PASSWORD");
-    }
-
-    @Lookup
-    ResourceFinder getRsFinder() {
-        return null;
     }
 }
