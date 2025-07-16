@@ -14,7 +14,7 @@ To download this repository:
 
 To build:
 
-`./mvnw build`
+`./mvnw package`
 
 To run locally:
 

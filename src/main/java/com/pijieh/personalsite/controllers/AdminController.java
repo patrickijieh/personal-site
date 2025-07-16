@@ -1,10 +1,15 @@
 package com.pijieh.personalsite.controllers;
 
+import com.google.gson.Gson;
+import com.pijieh.personalsite.database.DatabaseService;
+import com.pijieh.personalsite.models.BlogForm;
+import com.pijieh.personalsite.models.LoginForm;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.util.Map;
-
 import org.jooq.Record;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -23,15 +28,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.google.gson.Gson;
-import com.pijieh.personalsite.database.DBService;
-import com.pijieh.personalsite.models.BlogForm;
-import com.pijieh.personalsite.models.LoginForm;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-
 // Authenticated through AuthenticationInterceptor.java
+/**
+ * The Controller class for the /admin route.
+ *
+ * @author patrickijieh
+ */
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
@@ -39,26 +41,47 @@ public class AdminController {
     BCryptPasswordEncoder bcrypt;
 
     @Autowired
-    DBService dataSource;
+    DatabaseService dataSource;
 
-    private final static Logger logger = LoggerFactory.getLogger(AdminController.class);
-    private final static Gson gson = new Gson();
+    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
+    private static final Gson gson = new Gson();
 
+    /**
+     * GET /admin mapping.
+     *
+     * @param request full http request
+     * @return the admin dashboard html page
+     */
     @GetMapping("")
     public String admin(HttpServletRequest request) {
         return "/html/admin.html";
     }
 
+    /**
+     * GET /admin/create-post mapping.
+     *
+     * @return the create post html page
+     */
     @GetMapping("/create-post")
     public String createPostHtml() {
         return "/html/create_post.html";
     }
 
+    /**
+     * GET /admin/create-user mapping.
+     *
+     * @return the create user html page
+     */
     @GetMapping("/create-user")
     public String createUserHtml() {
         return "/html/create_user.html";
     }
 
+    /**
+     * GET /admin/logout mapping.
+     *
+     * @return redirects to / in RootController and invalidates user session
+     */
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         String user = session.getAttribute("username").toString();
@@ -67,8 +90,18 @@ public class AdminController {
         return "redirect:/";
     }
 
+    /**
+     * POST /admin/posts mapping.
+     *
+     * @param session  user session
+     * @param blogForm blog post information from user input
+     * @return a JSON object of the form {"message": "success", "id":
+     *         id}, or a 500 response if
+     *         the route fails
+     */
     @PostMapping("/posts")
-    public ResponseEntity<String> createPost(HttpSession session, @Validated @RequestBody BlogForm blogForm) {
+    public ResponseEntity<String> createPost(HttpSession session,
+            @Validated @RequestBody BlogForm blogForm) {
         String id = "-1";
         final HttpHeaders headers = new HttpHeaders();
         final OffsetDateTime postTime = OffsetDateTime.now();
@@ -122,6 +155,14 @@ public class AdminController {
         return new ResponseEntity<>(body, headers, HttpStatus.OK);
     }
 
+    /**
+     * POST /admin/users mapping.
+     *
+     * @param userForm user information from user input
+     * @return a JSON object of the form {"message": "success"}, or a 500 response
+     *         if
+     *         the route fails
+     */
     @PostMapping("/users")
     public ResponseEntity<String> createUser(@Validated @RequestBody LoginForm userForm) {
         String username = userForm.getUsername();

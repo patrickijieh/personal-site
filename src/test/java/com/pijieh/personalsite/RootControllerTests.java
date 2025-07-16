@@ -16,7 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import com.pijieh.personalsite.controllers.RootController;
-import com.pijieh.personalsite.database.DBService;
+import com.pijieh.personalsite.database.DatabaseService;
 import com.pijieh.personalsite.helpers.ResourceFinder;
 
 @WebMvcTest(RootController.class)
@@ -29,11 +29,12 @@ class RootControllerTests {
     private MockMvc mockMvc;
 
     @MockitoBean
-    DBService dataSource;
+    DatabaseService dataSource;
 
     @MockitoBean
     ResourceFinder rsFinder;
 
+    // Sanity check
     @Test
     void contextLoads() {
         assert rootController != null : "Test controller is null!";

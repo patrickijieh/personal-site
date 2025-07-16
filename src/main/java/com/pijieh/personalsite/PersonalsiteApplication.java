@@ -1,24 +1,41 @@
 package com.pijieh.personalsite;
 
+import com.pijieh.personalsite.database.DatabaseService;
+import com.pijieh.personalsite.helpers.ResourceFinder;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.sql.SQLException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Lookup;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.pijieh.personalsite.database.DBService;
-import com.pijieh.personalsite.helpers.ResourceFinder;
-
+/**
+ * The main entrypoint of the application.
+ *
+ * @author patrickijieh
+ */
 @SpringBootApplication
 public class PersonalsiteApplication {
     private static final Logger logger = LoggerFactory.getLogger(PersonalsiteApplication.class);
+
+    @Value("${database.min-pool-size}")
+    private int minPoolSize;
+
+    @Value("${database.max-pool-size}")
+    private int maxPoolSize;
+
+    @Value("${database.url}")
+    private String databaseUrl;
+
+    @Value("${database.username}")
+    private String databaseUsername;
+
+    @Value("${database.password}")
+    private String databasePassword;
 
     public static void main(String[] args) {
         SpringApplication.run(PersonalsiteApplication.class, args);
@@ -35,32 +52,8 @@ public class PersonalsiteApplication {
     }
 
     @Bean
-    DBService dataSource() throws PropertyVetoException, IOException, SQLException {
-        ComboPooledDataSource cpds = new ComboPooledDataSource();
-        cpds.setDriverClass("org.postgresql.Driver");
-        cpds.setJdbcUrl(dbUrl());
-        cpds.setUser(dbUsername());
-        cpds.setPassword(dbPassword());
-        cpds.setMinPoolSize(3);
-        cpds.setMaxPoolSize(10);
-        logger.info("Successfully created database datasource.");
-        return new DBService(cpds);
-    }
-
-    String dbUrl() throws IOException {
-        return getRsFinder().getEnvironmentVariable("DB_URL");
-    }
-
-    String dbUsername() throws IOException {
-        return getRsFinder().getEnvironmentVariable("DB_USERNAME");
-    }
-
-    String dbPassword() throws IOException {
-        return getRsFinder().getEnvironmentVariable("DB_PASSWORD");
-    }
-
-    @Lookup
-    ResourceFinder getRsFinder() {
-        return null;
+    DatabaseService dataSource() throws PropertyVetoException, IOException, SQLException {
+        return new DatabaseService("org.postgresql.Driver", databaseUrl, databaseUsername,
+                databasePassword, minPoolSize, maxPoolSize);
     }
 }
