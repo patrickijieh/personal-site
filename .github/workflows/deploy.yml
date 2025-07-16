@@ -1,9 +1,6 @@
 name: Deploy to DigitalOcean Server
 
 on:
-  push:
-    branches: 
-      - testing-cd
   pull_request:
     branches: 
       - deployment
@@ -15,7 +12,7 @@ permissions:
 
 jobs:
   deploy:
-    if: github.event.pull_request.merged || github.event_name == 'push'
+    if: github.event.pull_request.merged
     runs-on: ubuntu-latest
 
     steps:
@@ -37,4 +34,5 @@ jobs:
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /home/personalsite/personal-site\
           && tmux kill-session -t website;\
           tmux new -d -s website && tmux send-keys -t website \"./mvnw verify && java -jar target/personalsite-0.0.1-SNAPSHOT.jar\" ENTER"
+          echo "Successfully ran new deployment."
 
