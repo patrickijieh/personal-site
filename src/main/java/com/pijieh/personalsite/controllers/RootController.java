@@ -1,6 +1,9 @@
 package com.pijieh.personalsite.controllers;
 
 import com.pijieh.personalsite.helpers.ResourceFinder;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/")
 public class RootController {
     private static final Logger logger = LoggerFactory.getLogger(RootController.class);
-
+    private static final Logger analyticsLogger = LoggerFactory.getLogger("ANALYTICS");
     @Autowired
     ResourceFinder rsFinder;
 
@@ -42,12 +45,18 @@ public class RootController {
      * @return the bytes of the resume file, or 500 response if the route fails
      */
     @GetMapping("/resume")
-    public ResponseEntity<byte[]> resume() {
+    public ResponseEntity<byte[]> resume(HttpServletRequest request) {
+        String remoteAddr = request.getHeader("X-Real-IP");
+        if (remoteAddr == null || remoteAddr.isEmpty()) {
+            remoteAddr = request.getRemoteAddr();
+        }
         try {
             final byte[] resumeBytes = rsFinder.getResourceBytes("Ijieh_Patrick.pdf");
             final HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setCacheControl("no-cache");
+
+            analyticsLogger.info("Request from {} for CV", remoteAddr);
             return new ResponseEntity<>(resumeBytes, headers, HttpStatus.OK);
         } catch (IOException ex) {
             logger.error("", ex);
