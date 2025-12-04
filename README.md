@@ -6,7 +6,7 @@ It was written in Spring Boot, with a vanilla front-end (HTML/CSS/JS).
 
 ## Download & build instructions
 
-This project requires [Java 24](https://openjdk.org/projects/jdk/24/) to build and run.
+This project requires [Java 25](https://openjdk.org/projects/jdk/25/) to build and run.
 
 To download this repository:
 
