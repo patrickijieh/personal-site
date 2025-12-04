@@ -11,14 +11,14 @@
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/var/log/personalsite/website.log</file>
+        <file>/var/log/personalsite/website/website.log</file>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>DEBUG</level>
         </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/var/log/personalsite/website.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>/var/log/personalsite/website/website.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
-            <totalSizeCap>3GB</totalSizeCap>
+            <totalSizeCap>750MB</totalSizeCap>
         </rollingPolicy>
         <encoder>
             <pattern>
@@ -26,6 +26,26 @@
             </pattern>
         </encoder>
     </appender>
+
+    <appender name="ANALYTICS-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/var/log/personalsite/analytics/analytics.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/var/log/personalsite/analytics/analytics.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>750MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>
+                %d{dd-MM-yy HH:mm:ss.SSS} [%-20thread] %-5level %logger{36} -%kvp- %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+    <logger name="ANALYTICS" level="INFO" additivity="false">
+        <appender-ref ref="ANALYTICS-FILE" />
+    </logger>
 
     <root level="DEBUG">
         <appender-ref ref="CONSOLE" />
