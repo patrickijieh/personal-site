@@ -18,7 +18,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>/var/log/personalsite/website/website.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
-            <totalSizeCap>3GB</totalSizeCap>
+            <totalSizeCap>750MB</totalSizeCap>
         </rollingPolicy>
         <encoder>
             <pattern>
@@ -35,7 +35,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>/var/log/personalsite/analytics/analytics.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
-            <totalSizeCap>3GB</totalSizeCap>
+            <totalSizeCap>750MB</totalSizeCap>
         </rollingPolicy>
         <encoder>
             <pattern>
