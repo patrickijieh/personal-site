@@ -1,11 +1,14 @@
-name: Deploy to DigitalOcean Server
+name: Deploy to Server
 
 on:
   pull_request:
-    branches: 
+    branches:
       - deployment
     types:
       - closed
+  push:
+    branches:
+      - deployment
 
 permissions:
   contents: read
@@ -29,7 +32,7 @@ jobs:
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /home/personalsite/personal-site && git checkout deployment && git pull origin deployment"
           echo "Successfully pulled from repo."
 
-    - name: Build and Run application
+    - name: Build and Run Application
       run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /home/personalsite/personal-site\
           && tmux kill-session -t website;\
