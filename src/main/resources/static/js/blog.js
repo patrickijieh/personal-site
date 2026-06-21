@@ -63,6 +63,7 @@ function cleanup() {
 }
 
 function setup_blog() {
+    get_last_updated_date();
     get_posts();
 
     const target = document.getElementById("target");
@@ -133,7 +134,6 @@ async function get_posts() {
             .then(data => { return data; });
     } catch (err) {
         cleanup();
-        console.error(err);
         return;
     }
     append_posts(res.posts);

@@ -124,4 +124,23 @@ public class RootController {
         String body = gson.toJson(Map.of("last_updated", date));
         return new ResponseEntity<>(body, headers, HttpStatus.OK);
     }
+
+    /**
+     * GET /raspberrypi mapping.
+     *
+     * @return the bytes of the raspberry pi png, or 500 status if it fails
+     */
+    @GetMapping("/raspberrypi")
+    public ResponseEntity<byte[]> pi() throws GitAPIException {
+        try {
+            final byte[] iconBytes = rsFinder.getResourceBytes("raspberry_pi.png");
+            final HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_PNG);
+            headers.setCacheControl("no-cache");
+            return new ResponseEntity<>(iconBytes, headers, HttpStatus.OK);
+        } catch (IOException ex) {
+            logger.error("", ex);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
