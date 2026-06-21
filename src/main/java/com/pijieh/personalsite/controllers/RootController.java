@@ -120,7 +120,7 @@ public class RootController {
 
         DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
         String date = datetime.format(formatter);
-        redisClient.set("last-updated", date, new SetParams().ex(3600));
+        redisClient.set("last-updated", date, new SetParams().ex(7200));
         String body = gson.toJson(Map.of("last_updated", date));
         return new ResponseEntity<>(body, headers, HttpStatus.OK);
     }
