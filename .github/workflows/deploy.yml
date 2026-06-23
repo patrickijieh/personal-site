@@ -29,7 +29,7 @@ jobs:
     
     - name: Pull From GitHub & Deploy
       run: |
-          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /home/server/personalsite\
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /home/server/personal-site\
           && git checkout deployment\
           && git pull origin deployment;\
           tmux kill-session -t website;\
