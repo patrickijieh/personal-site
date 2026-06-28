@@ -4,13 +4,14 @@ async function get_post() {
     let res = await fetch("/blog/posts/" + postId, {
         method: "GET"
     })
-    .then(response => response.json())
-    .then(data => {return data;});
+        .then(response => response.json())
+        .then(data => { return data; });
 
     return res;
 }
 
 async function display_post() {
+    get_last_updated_date();
     const post = await get_post();
     if (!post) {
         return;
@@ -21,7 +22,7 @@ async function display_post() {
     const date = new Date(post.createdAt);
     const body = post.postBody;
 
-    const title_elem  = document.getElementById("title");
+    const title_elem = document.getElementById("title");
     const author_elem = document.getElementById("author");
     const date_elem = document.getElementById("date");
     const body_elem = document.getElementById("body");
