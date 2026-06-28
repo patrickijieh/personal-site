@@ -1,16 +1,22 @@
 package com.pijieh.personalsite.controllers;
 
 import com.google.gson.Gson;
+import com.pijieh.personalsite.database.DatabaseService;
 import com.pijieh.personalsite.helpers.ResourceFinder;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +49,9 @@ public class RootController {
 
     @Autowired
     RedisClient redisClient;
+
+    @Autowired
+    DatabaseService dataSource;
 
     /**
      * GET / mapping.
@@ -113,13 +122,38 @@ public class RootController {
             return new ResponseEntity<>(body, headers, HttpStatus.OK);
         }
 
+        OffsetDateTime latestPostDate = null;
+        try (Connection conn = dataSource.getConnection()) {
+            List<OffsetDateTime> latestPost = DSL.using(conn, SQLDialect.POSTGRES).resultQuery("""
+                    SELECT {0}
+                    FROM {1}
+                    ORDER BY ({0}) DESC
+                    LIMIT 1
+                    """,
+                    DSL.name("created_at"),
+                    DSL.name("posts"))
+                    .fetchStream()
+                    .map(record -> record.get("created_at", OffsetDateTime.class))
+                    .toList();
+            if (latestPost.size() > 0) {
+                latestPostDate = latestPost.get(0);
+            }
+        } catch (SQLException ex) {
+            logger.error("", ex);
+        }
+
         RevCommit commit = gitRepository.log().setMaxCount(1).call().iterator().next();
         PersonIdent author = commit.getAuthorIdent();
-        LocalDateTime datetime = LocalDateTime.ofInstant(
+        OffsetDateTime latestCommitDate = OffsetDateTime.ofInstant(
                 author.getWhenAsInstant(), author.getZoneId());
 
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
-        String date = datetime.format(formatter);
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+        String date;
+        if (latestPostDate == null || latestCommitDate.isAfter(latestPostDate)) {
+            date = latestCommitDate.format(formatter);
+        } else {
+            date = latestPostDate.format(formatter);
+        }
         redisClient.set("last-updated", date, new SetParams().ex(7200));
         String body = gson.toJson(Map.of("last_updated", date));
         return new ResponseEntity<>(body, headers, HttpStatus.OK);
