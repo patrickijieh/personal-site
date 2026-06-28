@@ -7,8 +7,9 @@
         <link rel="manifest" href="../favicon/site.webmanifest">
         <link rel="stylesheet" href="../styles/styles.css">
         <script src="https://flackr.github.io/scroll-timeline/dist/scroll-timeline.js"></script>
-        <script src="../js/animation.js"></script>
-        <script src="../js/hideHeader.js"></script>
+        <script src="../js/index.js"></script>
+        <script src="../js/get_last_updated.js"></script>
+        <script src="../js/hide_header.js"></script>
         <title>patrickijieh's Website</title>
     </head>
     <body>
@@ -21,7 +22,16 @@
         <main class="main">
             <section class="welcome">
                 <h2>Welcome to my website!</h2>
-                <img id="icon" src="/icon" alt="Profile image icon">
+                <img id="icon" src="/icon" alt="Profile image icon.">
+            </section>
+            <section class="introduction">
+                <p>Welcome to my personal website! Everything that you see here is being served to you by my Raspberry Pi!</p>
+                <div style="display: flex; justify-content: center;">
+                    <img id="pi" height="295" width="390" src="/raspberrypi" alt="Picture of my Raspberry Pi in a box.">
+                </div>
+                <p>I am a Master's student that likes to build random things :) <br />
+                If you want to check them out on my GitHub, you can check them out [<a href="https://github.com/patrickijieh" target="_blank" >here</a>] or by pressing the link in the top bar. <br />
+                Otherwise, my resume is down below, and you can access my blog stuff [<a href="/blog">here</a>].</p>
             </section>
             <section class="resume-section">
                 <h2>Resume:</h2>
@@ -33,7 +43,7 @@
         </main>
         <footer class="footer">
             <h1>For business inquiries: <a href="mailto:ijiehpatrick@gmail.com">ijiehpatrick@gmail.com</a></h1>
-            <h1 class="last-updated">Last updated on: 12-03-2025</h1>
+            <h1 id="last-updated" class="last-updated"></h1>
         </footer>
     </body>
 </html>

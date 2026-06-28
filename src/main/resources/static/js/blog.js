@@ -18,7 +18,7 @@ const handleIntersect = (entries) => {
 async function get_new_blog_page() {
 
     const last_post = document.getElementById("last-post");
-    
+
     const val = last_post.getAttribute("value").split("/");
     const id = val[0];
     const datetime = val[1];
@@ -31,16 +31,16 @@ async function get_new_blog_page() {
             },
             body: JSON.stringify({
                 "id": id,
-                "createdAt" : datetime
+                "createdAt": datetime
             })
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error();
-            }
-            return response.json();
-        })
-        .then(data => {return data;});
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error();
+                }
+                return response.json();
+            })
+            .then(data => { return data; });
     } catch (err) {
         cleanup();
         return;
@@ -55,10 +55,7 @@ function cleanup() {
         observer.disconnect();
     }
     const paragraph = document.createElement("p");
-    paragraph.innerHTML = "I was wrong. You're not greedy...<br /><br />\
-        ...<br /><br />\
-        ...<br /><br />\
-        you're BATS*** INSANE!";
+    paragraph.innerHTML = "You've reached the end.";
 
     target.appendChild(paragraph);
     paragraph.setAttribute("style", "text-align: center;");
@@ -66,6 +63,7 @@ function cleanup() {
 }
 
 function setup_blog() {
+    get_last_updated_date();
     get_posts();
 
     const target = document.getElementById("target");
@@ -101,7 +99,7 @@ function create_post_elements(postList) {
         root_element.appendChild(anchor);
 
         // add last-post tag to last element
-        if (i == postList.length-1) {
+        if (i == postList.length - 1) {
             const old_last_post = document.getElementById("last-post");
             if (old_last_post) {
                 old_last_post.removeAttribute("id");
@@ -127,16 +125,15 @@ async function get_posts() {
         res = await fetch("/blog/posts", {
             method: "GET"
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error();
-            }
-            return response.json();
-        })
-        .then(data => {return data;});
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error();
+                }
+                return response.json();
+            })
+            .then(data => { return data; });
     } catch (err) {
         cleanup();
-        console.error(err);
         return;
     }
     append_posts(res.posts);

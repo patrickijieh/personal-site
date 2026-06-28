@@ -1,10 +1,22 @@
 package com.pijieh.personalsite.controllers;
 
+import com.google.gson.Gson;
+import com.pijieh.personalsite.database.DatabaseService;
 import com.pijieh.personalsite.helpers.ResourceFinder;
-
 import jakarta.servlet.http.HttpServletRequest;
-
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.PersonIdent;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +27,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import redis.clients.jedis.RedisClient;
+import redis.clients.jedis.params.SetParams;
 
 /**
  * The Controller class for the / (root) route.
@@ -26,8 +40,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class RootController {
     private static final Logger logger = LoggerFactory.getLogger(RootController.class);
     private static final Logger analyticsLogger = LoggerFactory.getLogger("ANALYTICS");
+    private static final Gson gson = new Gson();
     @Autowired
     ResourceFinder rsFinder;
+
+    @Autowired
+    Git gitRepository;
+
+    @Autowired
+    RedisClient redisClient;
+
+    @Autowired
+    DatabaseService dataSource;
 
     /**
      * GET / mapping.
@@ -56,7 +80,7 @@ public class RootController {
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setCacheControl("no-cache");
 
-            analyticsLogger.info("Request from {} for CV", remoteAddr);
+            analyticsLogger.info("IP {} requested CV", remoteAddr);
             return new ResponseEntity<>(resumeBytes, headers, HttpStatus.OK);
         } catch (IOException ex) {
             logger.error("", ex);
@@ -73,6 +97,77 @@ public class RootController {
     public ResponseEntity<byte[]> icon() {
         try {
             final byte[] iconBytes = rsFinder.getResourceBytes("icon.png");
+            final HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_PNG);
+            headers.setCacheControl("no-cache");
+            return new ResponseEntity<>(iconBytes, headers, HttpStatus.OK);
+        } catch (IOException ex) {
+            logger.error("", ex);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * GET /last-updated mapping.
+     *
+     * @return the date the local git repository was last updated
+     */
+    @GetMapping("/last-updated")
+    public ResponseEntity<String> lastUpdated() throws GitAPIException {
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        if (redisClient.exists("last-updated")) {
+            String date = redisClient.get("last-updated");
+            String body = gson.toJson(Map.of("last_updated", date));
+            return new ResponseEntity<>(body, headers, HttpStatus.OK);
+        }
+
+        OffsetDateTime latestPostDate = null;
+        try (Connection conn = dataSource.getConnection()) {
+            List<OffsetDateTime> latestPost = DSL.using(conn, SQLDialect.POSTGRES).resultQuery("""
+                    SELECT {0}
+                    FROM {1}
+                    ORDER BY ({0}) DESC
+                    LIMIT 1
+                    """,
+                    DSL.name("created_at"),
+                    DSL.name("posts"))
+                    .fetchStream()
+                    .map(record -> record.get("created_at", OffsetDateTime.class))
+                    .toList();
+            if (latestPost.size() > 0) {
+                latestPostDate = latestPost.get(0);
+            }
+        } catch (SQLException ex) {
+            logger.error("", ex);
+        }
+
+        RevCommit commit = gitRepository.log().setMaxCount(1).call().iterator().next();
+        PersonIdent author = commit.getAuthorIdent();
+        OffsetDateTime latestCommitDate = OffsetDateTime.ofInstant(
+                author.getWhenAsInstant(), author.getZoneId());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+        String date;
+        if (latestPostDate == null || latestCommitDate.isAfter(latestPostDate)) {
+            date = latestCommitDate.format(formatter);
+        } else {
+            date = latestPostDate.format(formatter);
+        }
+        redisClient.set("last-updated", date, new SetParams().ex(7200));
+        String body = gson.toJson(Map.of("last_updated", date));
+        return new ResponseEntity<>(body, headers, HttpStatus.OK);
+    }
+
+    /**
+     * GET /raspberrypi mapping.
+     *
+     * @return the bytes of the raspberry pi png, or 500 status if it fails
+     */
+    @GetMapping("/raspberrypi")
+    public ResponseEntity<byte[]> pi() throws GitAPIException {
+        try {
+            final byte[] iconBytes = rsFinder.getResourceBytes("raspberry_pi.png");
             final HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.IMAGE_PNG);
             headers.setCacheControl("no-cache");

@@ -47,9 +47,9 @@ body {
 }
 
 .welcome img {
-    position: fixed;
+    position: relative;
     top: 50%;
-    left: 50%;
+    left: 0%;
     z-index: -1;
     border-radius: 50%;
 }
@@ -114,13 +114,14 @@ body {
 .resume-section {
     display: grid; 
     justify-items: center;
-    margin-top: 40rem;
-    margin-bottom: 40rem;
+    margin-top: 20rem;
+    margin-bottom: 20rem;
 }
 
 .posts-section {
     display: grid;
     align-items: center;
+    height: 80%;
 }
 
 .post-link {
@@ -150,4 +151,13 @@ body {
 .post-body {
     width: 75%;
     margin: 10rem;
+}
+
+.introduction {
+    display: flex;
+    width: 80%;
+    margin-left: 10%;
+    margin-right: 10%;
+    flex-direction: column;
+    justify-items: center;
 }
